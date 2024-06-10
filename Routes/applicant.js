@@ -78,7 +78,6 @@ router.get("/searchappliedposts", async (req, res)=>{
     try{
       const applicantid = req.query.applicantid;
       const status = req.query.status;
-      console.log(status)
       const filter = { _id: applicantid };
       const update = { $set: {status: status} };
       const updatedApplicant = await applicant.findOneAndUpdate(filter, update, { new: true });
@@ -106,7 +105,6 @@ router.get("/searchappliedposts", async (req, res)=>{
       return res.status(404).json({ message: "Applicant not found" });
     }
 
-    console.log(updatedApplicant);
     res.status(200).json(updatedApplicant); // Send the updated applicant back to the client
   } catch (error) {
     console.error("Error setting interview date:", error.message);
