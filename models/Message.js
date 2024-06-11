@@ -1,16 +1,15 @@
-const { type } = require("@testing-library/user-event/dist/type");
 const mongoose = require("mongoose");
 
 const MessageSchema = new mongoose.Schema({
+   conversationId: {
+    type: String,
+   },
+   sender: {
+    type: String,
+   },
+   text: {
+    type: String,
+   },
+}, { timestamps: true });
 
-   conversationId:{
-    type: String
-   },
-   sender:{
-    type: String
-   },
-   text:{
-    type: String
-   },
-});
 module.exports = mongoose.model("Message", MessageSchema);
