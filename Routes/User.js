@@ -80,6 +80,21 @@ router.post("/sendcode", async (req, res) => {
     res.status(500).send("Server error while sending code");
   }
 });
+
+//get user for message
   
+router.get("/getuser/:userId", async (req,res)=>{
+  const userId = req.params.userId
+  try{
+    const user = await User.findById(userId)
+
+    const {Password , ...other} = user._doc;
+    res.status(200).json(other);
+  }catch(err){
+    console.log("error geting user for massage" + err)
+    res.status(500).json(err)
+  }
+})
+
 
 module.exports = router;
