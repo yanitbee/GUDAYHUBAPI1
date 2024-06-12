@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const {applicant} = require("../models/applicant");
+const { sendInterviewDateEmail } = require('../utils/sendNotificationEmail');
 
 
 //to search if an applicant have already applied
@@ -100,6 +101,7 @@ router.get("/searchappliedposts", async (req, res)=>{
     const update = { $set: { interivewDate: interviewdate, interivewTime: interviewTime,  status: "Interview Set" } };
 
     const updatedApplicant = await applicant.findOneAndUpdate(filter, update, { new: true });
+
 
     if (!updatedApplicant) {
       return res.status(404).json({ message: "Applicant not found" });
