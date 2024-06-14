@@ -1,6 +1,9 @@
 const express = require("express");
 const router = express.Router();
 const {applicant} = require("../models/applicant");
+const {Hired} = require("../models/hired");
+const { User } = require("../models/User");
+const { Post } = require("../models/post");
 const { sendInterviewDateEmail } = require('../utils/sendNotificationEmail');
 
 
@@ -11,12 +14,17 @@ router.get("/searchapplied", async (req, res) => {
       const freelancerid = req.query.freelancerid;
       const postid = req.query.postid;
       const applied = await applicant.find({Freelancerid:freelancerid, postid:postid});
-      if (Array.isArray(applied) && applied.length === 0) {
-        return res.json({ message: "have not applied" });
-      } else {
+      const hired =  await Hired.find({Freelancerid:freelancerid, postid:postid});
+
+
+      
+      if (Array.isArray(applied) && applied.length === 0 && (Array.isArray(hired) && hired.length === 0)) {
+        return res.json({ message: "have not applied or been hired" });
+      } else if (Array.isArray(applied) && applied.length > 0) {
         return res.json({ message: "have applied" });
+      } else if (Array.isArray(hired) && hired.length > 0) {
+        return res.json({ message: "have been hired" });
       }
-     
       
     } catch (error) {
       console.error("Error reading post:", error);
@@ -107,7 +115,18 @@ router.get("/searchappliedposts", async (req, res)=>{
       return res.status(404).json({ message: "Applicant not found" });
     }
 
-    res.status(200).json(updatedApplicant); // Send the updated applicant back to the client
+    const freelancer = await User.findById(updatedApplicant.Freelancerid);
+    if (!freelancer) {
+      return res.status(404).json({ message: "Freelancer not found" });
+    }
+
+    const posted = await Post.findById(updatedApplicant.postid);
+    if (!posted) {
+      return res.status(404).json({ message: "Posted not found" });
+    }
+
+    res.status(200).json(updatedApplicant); 
+    sendInterviewDateEmail(freelancer,posted, updatedApplicant)
   } catch (error) {
     console.error("Error setting interview date:", error.message);
     res.status(500).send("Server error while setting interview date");

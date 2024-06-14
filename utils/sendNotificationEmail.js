@@ -57,12 +57,12 @@ async function sendWelcomeEmail(email,code) {
 
 async function sendInterviewDateEmail(freelancer,job,applicant) {
   const subject = 'You have got an interview date';
-  const text = `Hello ${freelancer.Fullname},\n\n An interview date has been scheduled for &#34;${job.Jobtitle}&#34; on ${applicant.interivewDate+" "+applicant.interivewTime}  \n\n 
+  const text = `Hello ${freelancer.Fullname},\n\n An interview date has been scheduled for &#34;${job.Jobtitle}&#34 job; on ${applicant.interivewDate+" "+applicant.interivewTime}  \n\n 
   Good luck. \n\n `;
   const html = `<p>Hello ${freelancer.Fullname}</p><p>An interview date has been scheduled for &#34;${job.Jobtitle}&#34; on ${applicant.interivewDate+" "+applicant.interivewTime} </p>
   ,</p><p>  Good luck.</p>`;
 
-  await sendEmail(email, subject, text, html);
+  await sendEmail(freelancer.Email, subject, text, html);
 }
 
 
