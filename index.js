@@ -13,6 +13,8 @@ const applicant = require("./Routes/applicant")
 const employer = require("./Routes/employer")
 const conversation = require("./Routes/conversations")
 const message = require("./Routes/messages")
+const PostHistory = require("./Routes/postHistory")
+
 
 mongoose
   .connect(process.env.URL)
@@ -32,6 +34,7 @@ app.use("/applicant", applicant)
 app.use("/employer", employer)
 app.use("/conversations", conversation)
 app.use("/messages", message)
+app.use("/PostHistory", PostHistory)
 
 
 const PORT = process.env.PORT || 4000;

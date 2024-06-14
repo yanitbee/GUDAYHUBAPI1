@@ -8,10 +8,12 @@ router.get("/readpost", async (req, res) => {
   try {
     const search = req.query.search;
     const searchtitle = req.query.serachtitle;
+     const filter =req.query.filter
 
     await Post.find({
       Jobtype: { $regex: search, $options: "i" },
       Jobtitle: { $regex: searchtitle, $options: "i" },
+      JobTask: { $regex: filter, $options: "i" },
     })
     .then((Post) => res.json(Post));
   } catch (error) {
@@ -36,6 +38,9 @@ router.post("/writepost", async (req, res) => {
         location,
         urgency,
         employerid,
+        anonymous,
+        cv,
+        coverletter
       } = req.body;
   
       const newPost = new Post({
@@ -50,7 +55,10 @@ router.post("/writepost", async (req, res) => {
         Contact,
         location,
         urgency: urgency === 'true', // Ensure this is a boolean
-        employerid
+        employerid,
+        anonymous,
+        cv,
+        coverletter
       });
       await newPost.save();
       res.json({ message: "Post saved successfully" });
