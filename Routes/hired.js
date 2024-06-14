@@ -23,6 +23,7 @@ router.get("/searchhiredposts", async (req, res)=>{
     try {
         const { appId } = req.body;
 
+        // Find the applicant by ID
         const Applicant = await applicant.findById(appId);
         if (!Applicant) {
             return res.status(404).send('Applicant not found');
