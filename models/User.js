@@ -46,9 +46,26 @@ const DataSchema = new mongoose.Schema({
       educations: { type: [String], default: [] },
       certifications: { type: [String], default: [] },
     },
-    gudayhistory: { type: [String], default: [] },
+    gudayhistory: {
+      jobs: {
+        type: Number,
+        default: null,
+        validate: {
+          validator: Number.isInteger,
+          message: "{VALUE} is not an integer value",
+        },
+      },
+      hired: {
+        type: Number,
+        default: null,
+        validate: {
+          validator: Number.isInteger,
+          message: "{VALUE} is not an integer value",
+        },
+      },
+    },
     workhistory: { type: [String], default: [] },
-    rating: { type: String, default: null },
+    rating: { type: Number, default: 0 },
     description: { type: String, default: null },
     portfolio: {
       link: { type: String, default: null },
@@ -60,10 +77,6 @@ const DataSchema = new mongoose.Schema({
   },
 });
 
-
 const User = mongoose.model("users", DataSchema);
 
 module.exports.User = User;
-
-
-

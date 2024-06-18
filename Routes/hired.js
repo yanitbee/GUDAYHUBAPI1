@@ -29,10 +29,13 @@ router.get("/searchhiredposts", async (req, res)=>{
             return res.status(404).send('Applicant not found');
         }
 
+        // Create a new Hired document from the Applicant data
         const hiredApplicant = new Hired(Applicant.toObject());
 
+        // Save the applicant to Hired collection
         await hiredApplicant.save();
 
+        // Remove the applicant from Applicant collection
         await applicant.findByIdAndDelete(appId);
 
         res.status(200).send('Applicant moved to hired successfully');
@@ -42,6 +45,21 @@ router.get("/searchhiredposts", async (req, res)=>{
     }
 });
 
+//shows hired to employer
+
+router.get("/readhired", async (req, res)=>{
+    try{
+      const postid = req.query.postid;
+       await Hired.find({postid:postid})
+      .then(Hired => res.json(Hired))
+  
+    
+    }catch (error){
+        console.log("errorr", error.message)
+        res.status(500).send("server error while reading applicant")
+        
+    }
+  })
 
 
   

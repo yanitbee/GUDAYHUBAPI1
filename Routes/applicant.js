@@ -93,6 +93,13 @@ router.get("/searchappliedposts", async (req, res)=>{
       if (!updatedApplicant) {
         return res.status(404).json({ message: "Applicant not found" });
       }
+      const userFilter = { _id: updatedApplicant.Freelancerid };
+      const userUpdate = { $inc: { 'freelancerprofile.gudayhistory.jobs': 1 } };
+      const user = await User.findOneAndUpdate(userFilter, userUpdate, { new: true });
+  
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
       res.status(200).json(updatedApplicant);
     }catch (error){
         console.log("errorr", error.message)
