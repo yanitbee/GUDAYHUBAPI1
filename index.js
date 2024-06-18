@@ -15,8 +15,23 @@ const conversation = require("./Routes/conversations")
 const message = require("./Routes/messages")
 const PostHistory = require("./Routes/postHistory")
 const hired = require("./Routes/hired")
+const i18next = require('i18next');
+const Backend = require('i18next-fs-backend');
+const middleware = require('i18next-http-middleware');
+const language = require("./Routes/language");
 
+// Initialize i18next
+i18next
+  .use(Backend)
+  .use(middleware.LanguageDetector)
+  .init({
+    fallbackLng: 'en',
+    backend: {
+      loadPath: path.join(__dirname, 'locales/{{lng}}/translation.json')
+    }
+  });
 
+app.use(middleware.handle(i18next));
 mongoose
   .connect(process.env.URL)
   .then(() => console.log("Success, MongoDB connected"))
@@ -37,6 +52,7 @@ app.use("/conversations", conversation)
 app.use("/messages", message)
 app.use("/PostHistory", PostHistory)
 app.use("/hired", hired)
+app.use("/language", language)
 
 
 const PORT = process.env.PORT || 4000;

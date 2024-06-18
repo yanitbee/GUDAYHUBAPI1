@@ -16,6 +16,10 @@ const DataSchema = new mongoose.Schema({
     required: true,
     unique: true,
   },
+  language: {
+    type: String,
+    default: "en",
+  },
   Fullname: {
     type: String,
     required: true,
