@@ -19,6 +19,7 @@ const i18next = require('i18next');
 const Backend = require('i18next-fs-backend');
 const middleware = require('i18next-http-middleware');
 const language = require("./Routes/language");
+const Complaint = require("./Routes/Complaint");
 
 // Initialize i18next
 i18next
@@ -53,6 +54,7 @@ app.use("/messages", message)
 app.use("/PostHistory", PostHistory)
 app.use("/hired", hired)
 app.use("/language", language)
+app.use("/Complaint", Complaint)
 
 
 const PORT = process.env.PORT || 4000;

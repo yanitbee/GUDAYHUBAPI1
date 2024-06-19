@@ -3,6 +3,24 @@ const router = express.Router();
 const { User } = require("../models/User");
 const upload = require("../FileHandler/profilepicConfig");
 
+
+//to searcch employer by id
+router.get("/serach/:id", async (req, res) => {
+  try {
+    const employerid = req.params.id;
+    const employer = await User.findById(employerid);
+    if (!employer) {
+      return res.status(404).json({ message: "employer not found" });
+    }
+    res.json(employer);
+    console.log(employer)
+    
+  } catch (error) {
+    console.error("Error reading post:", error);
+    res.status(500).json({ message: "Server error while reading employer" });
+  }
+});
+
 //to read freelancer for employer
 router.get("/readfromserver", (req, res) => {
   try {
