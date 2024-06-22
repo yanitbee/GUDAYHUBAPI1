@@ -96,5 +96,43 @@ router.get("/getuser/:userId", async (req,res)=>{
   }
 })
 
+router.put("/addrating/:id", async (req, res) => {
+  try {
+
+    const userid = req.params.id;
+    let {rating } = req.body;
+    rating = parseInt(rating, 10);
+
+    if (rating < 0 || rating > 5) {
+      return res.status(400).json({ message: 'Invalid rating value' });
+    }
+
+
+    const user = await User.findById(userid);
+
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    const currentRating = user.freelancerprofile.rating || 0;
+    const newRating = (currentRating + rating) / 2;
+
+    
+    const filter = { _id: userid };
+    const update = { $set: {'freelancerprofile.rating': newRating}};
+  
+    const updatedUser = await User.findOneAndUpdate(filter, update,{ new: true });
+
+    if (!updatedUser) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    res.status(200).json(updatedUser);
+  } catch (error) {
+    console.error("Error adding rating:", error);
+    res.status(500).json({ message: "Server error while adding rating" });
+  }
+});
+
 
 module.exports = router;

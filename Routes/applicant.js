@@ -93,6 +93,25 @@ router.get("/searchappliedposts", async (req, res)=>{
       if (!updatedApplicant) {
         return res.status(404).json({ message: "Applicant not found" });
       }
+
+      res.status(200).json(updatedApplicant);
+    }catch (error){
+        console.log("errorr", error.message)
+        res.status(500).send("server error while changing status")
+    }
+  })
+
+  router.put("/changehirestatus", async (req, res)=>{
+    try{
+      const applicantid = req.query.applicantid;
+      const status = req.query.status;
+      const filter = { _id: applicantid };
+      const update = { $set: {status: status} };
+      const updatedApplicant = await Hired.findOneAndUpdate(filter, update, { new: true });
+      if (!updatedApplicant) {
+        return res.status(404).json({ message: "Applicant not found" });
+      }
+
       res.status(200).json(updatedApplicant);
     }catch (error){
         console.log("errorr", error.message)
