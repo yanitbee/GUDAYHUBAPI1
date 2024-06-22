@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const {Hired} = require("../models/hired");
 const {applicant} = require("../models/applicant");
+const { User } = require("../models/User");
 const { ObjectId } = require('mongoose').Types;
 
 
@@ -34,6 +35,12 @@ router.get("/searchhiredposts", async (req, res)=>{
 
         // Save the applicant to Hired collection
         await hiredApplicant.save();
+        const userFilter = { _id: Applicant.Freelancerid };
+        const userUpdate = { $inc: { 'freelancerprofile.gudayhistory.jobs': 1 } };
+        const user = await User.findOneAndUpdate(userFilter, userUpdate, { new: true });
+        if (!user) {
+          return res.status(404).json({ message: "Freelancer not found" });
+        }
 
         // Remove the applicant from Applicant collection
         await applicant.findByIdAndDelete(appId);

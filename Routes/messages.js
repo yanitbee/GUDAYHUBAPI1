@@ -22,7 +22,7 @@ router.get("/:conversationId", async (req,res)=>{
         const messages = await Message.find({
             conversationId:req.params.conversationId
         });
-      const s =  res.status(200).json(messages )
+    res.status(200).json(messages )
     }catch(err){
         res.status(500).json(err);
     }

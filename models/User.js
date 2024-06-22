@@ -53,7 +53,7 @@ const DataSchema = new mongoose.Schema({
     gudayhistory: {
       jobs: {
         type: Number,
-        default: null,
+        default: 0,
         validate: {
           validator: Number.isInteger,
           message: "{VALUE} is not an integer value",
@@ -61,7 +61,7 @@ const DataSchema = new mongoose.Schema({
       },
       hired: {
         type: Number,
-        default: null,
+        default: 0,
         validate: {
           validator: Number.isInteger,
           message: "{VALUE} is not an integer value",

@@ -1,28 +1,18 @@
 const nodemailer = require('nodemailer');
-const { google } = require('googleapis');
-const OAuth2 = google.auth.OAuth2;
 require("dotenv").config();
 
-const OAuth2_client = new OAuth2(process.env.clientId, process.env.clientSecret);
-OAuth2_client.setCredentials({ refresh_token: process.env.refreshToken });
-
+// Function to send email
 async function sendEmail(to, subject, text, html) {
-  const accessToken = await OAuth2_client.getAccessToken();
-
   const transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: {
-      type: 'OAUTH2',
-      user: process.env.user,
-      clientId: process.env.clientId,
-      clientSecret: process.env.clientSecret,
-      refreshToken: process.env.refreshToken,
-      accessToken: accessToken.token
+      user: process.env.EMAIL_USER,
+      pass: process.env.EMAIL_APP_PASSWORD
     }
   });
 
   const mailOptions = {
-    from: process.env.user,
+    from: process.env.EMAIL_USER,
     to: to,
     subject: subject,
     text: text,
@@ -37,6 +27,16 @@ async function sendEmail(to, subject, text, html) {
   }
 }
 
+async function sendWelcomeEmail(to, code) {
+  const subject = 'Welcome to GudayHub!';
+  const text = `Welcome to GudayHub, Your verification code is: ${code}\n\nIf you didn't register to our platform kindly ignore this email.`;
+  const html = `<p>Welcome to GudayHub!</p><p>Your verification code is: <strong>${code}</strong></p><p>If you didn't register to our platform kindly ignore this email.</p>`;
+
+  await sendEmail(to, subject, text, html);
+}
+
+
+// Function to send notification email
 async function sendNotificationEmail(freelancer, job) {
   const subject = `New Job Matching Your Profile: ${job.Jobtitle}`;
   const text = `Hello ${freelancer.Fullname},\n\nA new job titled "${job.Jobtitle}" that matches your skills has been posted. Check it out!`;
@@ -45,29 +45,27 @@ async function sendNotificationEmail(freelancer, job) {
   await sendEmail(freelancer.Email, subject, text, html);
 }
 
-async function sendWelcomeEmail(email,code) {
-  const subject = 'Your Verification Code';
-  const text = `Hello,\n\nWelcome to our GudayHub. To finish registration, please enter this verification  code: ${code} .This code will expire in 10 minutes. \n\n
-  If you did not make this request, please ignore this email.`;
-  const html = `<p>Hello ,</p><p>Welcome to our GudayHub. To finish registration, please enter this verification  code: ${code}. This code will expire in 10 minutes.</p>
-  ,</p><p> If you did not make this request, please ignore this email.</p>`;
-
-  await sendEmail(email, subject, text, html);
-}
-
-async function sendInterviewDateEmail(freelancer,job,applicant) {
+// Function to send interview date email
+async function sendInterviewDateEmail(freelancer, job, applicant) {
   const subject = 'You have got an interview date';
-  const text = `Hello ${freelancer.Fullname},\n\n An interview date has been scheduled for &#34;${job.Jobtitle}&#34 job; on ${applicant.interivewDate+" "+applicant.interivewTime}  \n\n 
-  Good luck. \n\n `;
-  const html = `<p>Hello ${freelancer.Fullname}</p><p>An interview date has been scheduled for &#34;${job.Jobtitle}&#34; on ${applicant.interivewDate+" "+applicant.interivewTime} </p>
-  ,</p><p>  Good luck.</p>`;
+  const text = `Hello ${freelancer.Fullname},\n\nAn interview date has been scheduled for "${job.Jobtitle}" job on ${applicant.interviewDate} ${applicant.interviewTime}\n\nGood luck.\n\n`;
+  const html = `<p>Hello ${freelancer.Fullname},</p><p>An interview date has been scheduled for "<strong>${job.Jobtitle}</strong>" on ${applicant.interviewDate} ${applicant.interviewTime}</p><p>Good luck.</p>`;
 
   await sendEmail(freelancer.Email, subject, text, html);
 }
 
+// Function to send offer email
+async function sendOfferEmail(freelancer, user) {
+  const subject = 'You have got an Offer';
+  const text = `Hello ${freelancer.Fullname},\n\nA new offer has been made by ${user.Fullname}. Check it out and give your response.\n\n`;
+  const html = `<p>Hello ${freelancer.Fullname},</p><p>A new offer has been made by ${user.Fullname}. Check it out and give your response.</p>`;
+
+  await sendEmail(freelancer.Email, subject, text, html);
+}
 
 module.exports = {
   sendNotificationEmail,
-  sendWelcomeEmail,
-  sendInterviewDateEmail
+  sendInterviewDateEmail,
+  sendOfferEmail,
+  sendWelcomeEmail
 };

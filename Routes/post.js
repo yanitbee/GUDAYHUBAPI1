@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const { Post } = require("../models/post");
+const { User } = require("../models/User");
 const { findMatchingFreelancers } = require('../utils/findMatchingFreelancers');
 const { sendNotificationEmail } = require('../utils/sendNotificationEmail');
 
@@ -61,7 +62,16 @@ router.post("/writepost", async (req, res) => {
         coverletter
       });
       await newPost.save();
+      const userFilter = { _id: employerid };
+ 
+      const userUpdate = { $inc: { 'freelancerprofile.gudayhistory.Jobs': 1 } };
+      const user = await User.findOneAndUpdate(userFilter, userUpdate, { new: true });
+      if (!user) {
+        return res.status(404).json({ message: "Freelancer not found" });
+      }
       res.json({ message: "Post saved successfully" });
+
+
 
       const matchedFreelancers = await findMatchingFreelancers(newPost);
 

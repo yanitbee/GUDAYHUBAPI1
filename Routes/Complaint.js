@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const { Complaint } = require("../models/complaint");
-const { sendNotificationEmail } = require('../utils/sendNotificationEmail');
+
 
 router.get("/readcomplaint", async (req, res) => {
   try {
