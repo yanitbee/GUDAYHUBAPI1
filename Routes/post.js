@@ -64,7 +64,7 @@ router.post("/writepost", async (req, res) => {
       await newPost.save();
       const userFilter = { _id: employerid };
  
-      const userUpdate = { $inc: { 'freelancerprofile.gudayhistory.Jobs': 1 } };
+      const userUpdate = { $inc: { 'freelancerprofile.gudayhistory.jobs': 1 } };
       const user = await User.findOneAndUpdate(userFilter, userUpdate, { new: true });
       if (!user) {
         return res.status(404).json({ message: "Freelancer not found" });
@@ -118,6 +118,24 @@ router.post("/writepost", async (req, res) => {
       }
     })
 
+
+    // delete post
+router.delete('/deletepost/:id', async (req, res) => {
+  try {
+      const postId = req.params.id;
+     const post = await Post.findOneAndDelete({ _id: postId });
+      
+   console.log(postId)
+      if (!post) {
+          return res.status(404).json({ error: 'Post not found' });
+      }
+
+      return res.json({ message: 'Post deleted successfully' });
+  } catch (error) {
+      console.error('Error deleting post:', error.message);
+      return res.status(500).json({ error: 'Server error' });
+  }
+});
 
 module.exports = router;
 
