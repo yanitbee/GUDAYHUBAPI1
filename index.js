@@ -1,27 +1,49 @@
 const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
-require("dotenv").config();
-
-const app = express();
 const path = require('path');
-const user = require("./Routes/User");
-const login = require("./Routes/login")
-const post = require("./Routes/post")
-const freelancer = require("./Routes/freelancer")
-const applicant = require("./Routes/applicant")
-const employer = require("./Routes/employer")
-const conversation = require("./Routes/conversations")
-const message = require("./Routes/messages")
-const PostHistory = require("./Routes/postHistory")
-const hired = require("./Routes/hired")
 const i18next = require('i18next');
 const Backend = require('i18next-fs-backend');
 const middleware = require('i18next-http-middleware');
-const language = require("./Routes/language");
-const Complaint = require("./Routes/Complaint");
-const Offer = require("./Routes/offer");
-// Initialize i18next
+require("dotenv").config();
+
+const skillTestRoutes = require("./Routes/skillTests");
+const userRoutes = require("./Routes/User");
+const loginRoutes = require("./Routes/login");
+const postRoutes = require("./Routes/post");
+const freelancerRoutes = require("./Routes/freelancer");
+const applicantRoutes = require("./Routes/applicant");
+const employerRoutes = require("./Routes/employer");
+const conversationRoutes = require("./Routes/conversations");
+const messageRoutes = require("./Routes/messages");
+const PostHistoryRoutes = require("./Routes/postHistory");
+const hiredRoutes = require("./Routes/hired");
+const languageRoutes = require("./Routes/language");
+const ComplaintRoutes = require("./Routes/Complaint");
+const OfferRoutes = require("./Routes/offer");
+
+const app = express();
+const PORT = process.env.PORT || 4000;
+
+// MongoDB connection
+mongoose.connect(process.env.URL, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+})
+.then(() => console.log("Success, MongoDB connected"))
+.catch((error) => console.error("Error connecting to MongoDB:", error));
+
+// CORS middleware
+app.use(cors());
+
+// Body parser middleware
+app.use(express.json());
+app.use(express.urlencoded({ extended: false }));
+
+// Serve static files
+app.use(express.static(path.join(__dirname, "public")));
+
+// i18next initialization
 i18next
   .use(Backend)
   .use(middleware.LanguageDetector)
@@ -33,29 +55,24 @@ i18next
   });
 
 app.use(middleware.handle(i18next));
-mongoose
-  .connect(process.env.URL)
-  .then(() => console.log("Success, MongoDB connected"))
-  .catch((ex) => console.error(ex));
 
-app.use(cors());
-app.use(express.json());
-app.use(express.static(path.join(__dirname, "public")));
+// Routes
+app.use('/skillTests', skillTestRoutes);
+app.use("/user", userRoutes);
+app.use("/login", loginRoutes);
+app.use("/post", postRoutes);
+app.use("/freelancer", freelancerRoutes);
+app.use("/applicant", applicantRoutes);
+app.use("/employer", employerRoutes);
+app.use("/conversations", conversationRoutes);
+app.use("/messages", messageRoutes);
+app.use("/PostHistory", PostHistoryRoutes);
+app.use("/hired", hiredRoutes);
+app.use("/language", languageRoutes);
+app.use("/Complaint", ComplaintRoutes);
+app.use("/Offer", OfferRoutes);
 
-
-app.use("/user", user);
-app.use("/login", login)
-app.use("/post", post)
-app.use("/freelancer", freelancer)
-app.use("/applicant", applicant)
-app.use("/employer", employer)
-app.use("/conversations", conversation)
-app.use("/messages", message)
-app.use("/PostHistory", PostHistory)
-app.use("/hired", hired)
-app.use("/language", language)
-app.use("/Complaint", Complaint)
-app.use("/Offer", Offer)
-
-const PORT = process.env.PORT || 4000;
-app.listen(PORT, () => console.log(`Server started on port ${PORT}`));
+// Start server
+app.listen(PORT, () => {
+  console.log(`Server started on port ${PORT}`);
+});

@@ -1,4 +1,3 @@
-// models/SkillTest.js
 const mongoose = require('mongoose');
 
 const questionSchema = new mongoose.Schema({
@@ -14,4 +13,5 @@ const skillTestSchema = new mongoose.Schema({
 });
 
 const SkillTest = mongoose.model('SkillTest', skillTestSchema);
+
 module.exports = SkillTest;

@@ -118,6 +118,25 @@ router.post("/writepost", async (req, res) => {
       }
     })
 
+    // delete post
+router.delete('/deletepost/:id', async (req, res) => {
+  try {
+      const postId = req.params.id;
+     const post = await Post.findOneAndDelete({ _id: postId, userId: req.user.id });
+
+      
+   console.log(postId)
+      if (!post) {
+          return res.status(404).json({ error: 'Post not found' });
+      }
+
+      return res.json({ message: 'Post deleted successfully' });
+  } catch (error) {
+      console.error('Error deleting post:', error.message);
+      return res.status(500).json({ error: 'Server error' });
+  }
+});
+
 
 module.exports = router;
 
