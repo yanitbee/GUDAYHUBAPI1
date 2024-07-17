@@ -21,6 +21,7 @@ const middleware = require('i18next-http-middleware');
 const language = require("./Routes/language");
 const Complaint = require("./Routes/Complaint");
 const Offer = require("./Routes/offer");
+const testimony = require("./Routes/testimony");
 // Initialize i18next
 i18next
   .use(Backend)
@@ -56,6 +57,7 @@ app.use("/hired", hired)
 app.use("/language", language)
 app.use("/Complaint", Complaint)
 app.use("/Offer", Offer)
+app.use("/testimony", testimony)
 
 const PORT = process.env.PORT || 4000;
 app.listen(PORT, () => console.log(`Server started on port ${PORT}`));

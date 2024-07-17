@@ -22,14 +22,23 @@ router.get("/serach/:id", async (req, res) => {
 });
 
 //to read freelancer for employer
-router.get("/readfromserver", (req, res) => {
+router.get("/readfromserver", async (req, res) => {
   try {
-    User.find().then((User) => res.json(User));
+    const search = req.query.serachtitle || "";  // Default to an empty string if search query is not provided
+    const users = await User.find({
+      $or: [
+        { "freelancerprofile.title": { $regex: search, $options: "i" } },
+        { "freelancerprofile.title": null },  // Include documents where title is null
+      ],
+    });
+    res.json(users);
   } catch (error) {
-    console.log("errorr", error.message);
-    res.status(500).send("server error while reading data");
+    console.log("error", error.message);
+    res.status(500).send("Server error while reading data");
   }
 });
+
+
 
 //to serach freelancer detail
 

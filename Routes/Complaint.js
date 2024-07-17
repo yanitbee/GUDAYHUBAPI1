@@ -6,7 +6,7 @@ const { Complaint } = require("../models/complaint");
 router.get("/readcomplaint", async (req, res) => {
   try {
 
-    await Complaint.findAll()
+    await Complaint.find()
     .then((Complaint) => res.json(Complaint));
   } catch (error) {
     console.log("errorr", error.message);

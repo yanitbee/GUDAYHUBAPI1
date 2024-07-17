@@ -134,5 +134,24 @@ router.put("/addrating/:id", async (req, res) => {
   }
 });
 
+//serach user with id for testimony
+
+router.get("/serach/:id", async (req, res) => {
+  try {
+    const userid = req.params.id;
+    const user = await User.findById(userid);
+    if (!user) {
+      return res.status(404).json({ message: "user not found" });
+    }
+    res.json(user);
+
+    
+  } catch (error) {
+    console.error("Error serching user:", error);
+    res.status(500).json({ message: "Server error while serching user" });
+  }
+});
+
+
 
 module.exports = router;
