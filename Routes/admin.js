@@ -365,20 +365,22 @@ router.put("/resetPassword/:id", async (req, res) => {
   router.get("/readpost", async (req, res) => {
     try {
       const search = req.query.search || ""; 
-      const searchtitle = req.query.serachtitle || ""; 
-       const filter =req.query.filter || ""; 
+      const searchtitle = req.query.searchtitle || ""; 
+      const filter = req.query.filter || ""; 
   
-      await Post.find({
+      const posts = await Post.find({
         Jobtype: { $regex: search, $options: "i" },
         Jobtitle: { $regex: searchtitle, $options: "i" },
         JobTask: { $regex: filter, $options: "i" },
-      })
-      .then((Post) => res.json(Post));
+      });
+  
+      res.json(posts);
     } catch (error) {
-      console.log("errorr", error.message);
-      res.status(500).send("server error while reading post");
+      console.error("Error:", error.message);
+      res.status(500).send("Server error while reading post");
     }
   });
+  
 
     //get all jobs
     router.get("/readAllpost", async (req, res) => {

@@ -69,6 +69,10 @@ const DataSchema = new mongoose.Schema({
     type: String,
     default: 'active'
   },
+  CreatedDate: {
+    type: Date,
+    default: Date.now
+},
   freelancerprofile: {
     profilepic: { type: String, default: null },
     title: { type: String, default: null },
