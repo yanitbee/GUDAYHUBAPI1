@@ -117,49 +117,66 @@ router.get("/allUser", async (req, res) => {
 
   //register users
   router.post("/registerUserAdmin", async (req, res) => {
-    try { 
+    try {
+      const { Usertype, Fullname, username, Phonenumber, Email, Password, Gender, profilepic, title, freelancerprofile, code } = req.body;
   
-      let aUser = await User.find({ username: req.body.username });
-      if (aUser.length > 0) {
-        return res.status(400).send("User already registered");
+      // Check for duplicate username
+      let existingUser = await User.findOne({ username });
+      if (existingUser) {
+        return res.status(400).send("Username already registered");
       }
-      const code = req.body.code
-      const user = new User({
-        Usertype: req.body.Usertype,
-        Fullname: req.body.Fullname,
-        username: req.body.username,
-        Phonenumber: req.body.Phonenumber,
-        Email: req.body.Email,
-        Password: await bcrypt.hash(req.body.Password, 10),
-        Gender: req.body.Gender,
-        profilepic: req.body.profilepic,
-        title: req.body.title,
-        freelancerprofile: req.body.freelancerprofile,
-      });
-      const vercode = await Vcode.findOne({email:user.Email });
-    
+  
+      // Check for duplicate email
+      existingUser = await User.findOne({ Email });
+      if (existingUser) {
+        return res.status(400).send("Email already registered");
+      }
+  
+      // Fetch the verification code
+      const vercode = await Vcode.findOne({ email: Email });
   
       if (!vercode) {
-        return res.status(404).send("User not found");
+        return res.status(404).send("Verification code not found");
       }
   
       if (vercode.verificationCode !== code) {
-        return res.status(400).send("Invalid code");
+        return res.status(400).send("Invalid verification code");
       }
   
       if (new Date() > vercode.codeExpiry) {
-        return res.status(400).send("Code has expired");
+        return res.status(400).send("Verification code has expired");
       }
+
+
+      status = "Active"
   
-      Vcode.verificationCode = null;
-      Vcode.codeExpiry = null;
-      console.log(user);
+      const user = new User({
+        Usertype,
+        Fullname,
+        username,
+        Phonenumber,
+        Email,
+        Password: await bcrypt.hash(Password, 10),
+        Gender,
+        profilepic,
+        title,
+        status ,
+        freelancerprofile,
+
+      });
+  
+      // Clear the verification code
+      vercode.verificationCode = null;
+      vercode.codeExpiry = null;
+      await vercode.save();
+  
+      // Save the user
       await user.save();
   
-      res.status(201).json({ message: "data saved successfully" });
+      res.status(201).json({ message: "User registered successfully" });
     } catch (error) {
-      console.log("errorrrrrrr", error);
-      res.status(500).send("server error while saving data erorrrrrrrr");
+      console.log("Error:", error);
+      res.status(500).send("Server error while registering user");
     }
   });
 
