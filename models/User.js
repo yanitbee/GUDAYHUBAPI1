@@ -65,6 +65,10 @@ const DataSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  status:{
+    type: String,
+    default: 'active'
+  },
   freelancerprofile: {
     profilepic: { type: String, default: null },
     title: { type: String, default: null },
