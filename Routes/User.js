@@ -3,7 +3,7 @@ const router = express.Router();
 const bcrypt = require("bcrypt");
 const { User } = require("../models/User");
 const { Vcode } = require("../models/verifycod");
-const { sendWelcomeEmail } = require('../utils/sendNotificationEmail');
+const { sendWelcomeEmail,contactFormUsers } = require('../utils/sendNotificationEmail');
 
 router.post("/registerUser", async (req, res) => {
   try { 
@@ -23,6 +23,7 @@ router.post("/registerUser", async (req, res) => {
       Gender: req.body.Gender,
       profilepic: req.body.profilepic,
       title: req.body.title,
+      IsVerified:req.body.IsVerified || false,
       freelancerprofile: req.body.freelancerprofile,
     });
     const vercode = await Vcode.findOne({email:user.Email });
@@ -149,6 +150,19 @@ router.get("/serach/:id", async (req, res) => {
   } catch (error) {
     console.error("Error serching user:", error);
     res.status(500).json({ message: "Server error while serching user" });
+  }
+});
+
+router.post('/writecontact', async (req, res) => {
+  try {
+    const { fullname, email, message} = req.body;
+
+    await contactFormUsers(fullname, email, message)
+
+    res.json({ message: 'Email sent successfully' });
+  } catch (error) {
+    console.log('Error contacting:', error.message);
+    res.status(500).send('Server error while contacting');
   }
 });
 

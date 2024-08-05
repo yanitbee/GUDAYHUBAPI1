@@ -95,6 +95,8 @@ router.get("/serach/:id", async (req, res) => {
 });
 
 
+
+
 //get all users
 
 router.get("/allUser", async (req, res) => {
@@ -210,7 +212,30 @@ router.get("/allUser", async (req, res) => {
   });
 
 
+  router.put("/verifieUser/:username",uploadDoc.fields([
+    { name: 'VerifiedDoc', maxCount: 1 } 
+  ]) ,async (req, res) => {
+    try {
+      const DocPath = req.files && req.files.VerifiedDoc && req.files.VerifiedDoc.length > 0 ? `documents/${req.files.VerifiedDoc[0].filename}` : null;
+        const update = {$set: {}  };
 
+        update.$set['IsVerified'] = true;
+        if (DocPath) {
+          update.$set['VerifiedDoc'] = DocPath;
+        } 
+        const result = await User.findOneAndUpdate({ username: req.params.username }, update, { new: true });
+   
+        if (!result) {
+          return res.status(404).json({ message: 'User not found' });
+        }
+  
+        res.status(200).json({ message: 'verification successful' });
+    
+      } catch (error) {
+        console.error("Error verifying user:", error);
+        res.status(500).json({ message: "Server error while verifying user" });
+      }
+    })
 
 
   router.put("/picedit/:id", upload.single('file'), async (req, res) => {
