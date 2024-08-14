@@ -4,6 +4,7 @@ const { Post } = require("../models/post");
 const { User } = require("../models/User");
 const { findMatchingFreelancers } = require('../utils/findMatchingFreelancers');
 const { sendNotificationEmail } = require('../utils/sendNotificationEmail');
+const { body, validationResult } = require('express-validator');
 
 router.get("/readpost", async (req, res) => {
   try {
@@ -23,69 +24,93 @@ router.get("/readpost", async (req, res) => {
   }
 });
 
-//to write post
-router.post("/writepost", async (req, res) => {
-    try {
-      const {
-        JobTask,
-        Jobtype,
-        Jobtitle,
-        Description,
-        Qualification,
-        PostedDate,
-        Deadline,
-        Salary,
-        Contact,
-        location,
-        urgency,
-        employerid,
-        anonymous,
-        cv,
-        coverletter
-      } = req.body;
-  
-      const newPost = new Post({
-        JobTask,
-        Jobtype,
-        Jobtitle,
-        Description,
-        Qualification,
-        PostedDate,
-        Deadline,
-        Salary,
-        Contact,
-        location,
-        urgency: urgency === 'true', // Ensure this is a boolean
-        employerid,
-        anonymous,
-        cv,
-        coverletter
-      });
-      await newPost.save();
-      const userFilter = { _id: employerid };
- 
-      const userUpdate = { $inc: { 'freelancerprofile.gudayhistory.jobs': 1 } };
-      const user = await User.findOneAndUpdate(userFilter, userUpdate, { new: true });
-      if (!user) {
-        return res.status(404).json({ message: "Freelancer not found" });
-      }
-      res.json({ message: "Post saved successfully" });
 
 
+// to write post
+router.post("/writepost", [
+  body('JobTask').notEmpty().withMessage('JobTask is required'),
+  body('Jobtype').notEmpty().withMessage('Jobtype is required'),
+  body('Jobtitle').notEmpty().withMessage('Jobtitle is required'),
+  body('Description').notEmpty().withMessage('Description is required'),
+  body('Qualification').optional().isString().withMessage('Qualification must be a string'),
+  body('PostedDate').optional().isISO8601().withMessage('PostedDate must be a valid date'),
+  body('Deadline').optional().isISO8601().withMessage('Deadline must be a valid date'),
+  body('Salary').optional().isNumeric().withMessage('Salary must be a number'),
+  body('Contact').optional().isString().withMessage('Contact must be a string'),
+  body('location').optional().isString().withMessage('Location must be a string'),
+  body('urgency').notEmpty().isBoolean().withMessage('Urgency must be true or false'),
+  body('employerid').notEmpty().isMongoId().withMessage('Employer ID must be a valid Mongo ID'),
+  body('anonymous').optional().isBoolean().withMessage('Anonymous must be true or false'),
+  body('cv').optional().isBoolean().withMessage('CV must be true or false'),
+  body('coverletter').optional().isBoolean().withMessage('Cover Letter must be true or false')
+], async (req, res) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ errors: errors.array() });
+  }
 
-      const matchedFreelancers = await findMatchingFreelancers(newPost);
+  try {
+    const {
+      JobTask,
+      Jobtype,
+      Jobtitle,
+      Description,
+      Qualification,
+      PostedDate,
+      Deadline,
+      Salary,
+      Contact,
+      location,
+      urgency,
+      employerid,
+      anonymous,
+      cv,
+      coverletter
+    } = req.body;
 
-      if(matchedFreelancers){
+    const newPost = new Post({
+      JobTask,
+      Jobtype,
+      Jobtitle,
+      Description,
+      Qualification,
+      PostedDate,
+      Deadline,
+      Salary,
+      Contact,
+      location,
+      urgency: urgency === 'true',
+      employerid,
+      anonymous,
+      cv,
+      coverletter
+    });
+
+    await newPost.save();
+
+    const userFilter = { _id: employerid };
+    const userUpdate = { $inc: { 'freelancerprofile.gudayhistory.jobs': 1 } };
+    const user = await User.findOneAndUpdate(userFilter, userUpdate, { new: true });
+
+    if (!user) {
+      return res.status(404).json({ message: "Freelancer not found" });
+    }
+
+    res.json({ message: "Post saved successfully" });
+
+    const matchedFreelancers = await findMatchingFreelancers(newPost);
+
+    if (matchedFreelancers) {
       matchedFreelancers.forEach(freelancer => {
         sendNotificationEmail(freelancer, newPost);
       });
     }
-  
-    } catch (error) {
-      console.log("error posting job", error.message);
-      res.status(500).send("Server error while saving post");
-    }
-  });
+    
+  } catch (error) {
+    console.log("Error posting job:", error.message);
+    res.status(500).send("Server error while saving post");
+  }
+});
 
   
 

@@ -33,6 +33,8 @@ const validateEmailDomain = (email) => {
   return !invalidDomains.includes(domain);
 };
 
+
+
 router.post(
   "/registerUser",
   [
