@@ -5,7 +5,7 @@ const { User } = require("../models/User");
 const { sendOfferEmail } = require('../utils/sendNotificationEmail');
 
 
-//to write post
+//to write offer
 router.post("/write", async (req, res) => {
     try {
       const {
@@ -45,20 +45,20 @@ router.post("/write", async (req, res) => {
     }
   });
 
-//read 
-  router.get("/read" , async (req,res) => {
+   //offer employer has posted
+   router.get("/reademployerOffer", async (req, res)=>{
     try{
-    const id = req.query.freelancerid
-
-     await Offer.find({freelancerid: id})
-    .then(Offer => res.json(Offer))
+      const employerid =req.query.employerid;
     
-}catch(err){
-  console.log("error reading offer" + err )
-  res.status(500).send("error while reading offer")
-}
+      await Offer.find({employerid: employerid} )
+      
+    .then(Offer => res.json(Offer))
+    }catch (error){
+        console.log("errorr", error.message)
+        res.status(500).send("server error while reading post")
+  
+    }
   })
-
   router.put("/changestatus", async (req, res)=>{
     try{
       const offerid = req.query.offerid;

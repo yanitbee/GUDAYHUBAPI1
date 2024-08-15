@@ -69,14 +69,14 @@ router.put("/edit/:id", uploadDoc.fields([
   { name: 'educationDocs', maxCount: 10 },
   { name: 'certificationDocs', maxCount: 10 }]), async (req, res) => {
   try {
-
+console.log(req.params.id)
     const freelancerid = req.params.id;
     const {title,skills, workhistory, description} = req.body;
     const cvPath = req.files.cv ? `documents/${req.files.cv[0].filename}` : null;
     const educationDocsPath = req.files.educationDocs ? req.files.educationDocs.map(file => `documents/${file.filename}` ): null;
     const certificationDocsPath = req.files.certificationDocs ? req.files.certificationDocs.map(file => `documents/${file.filename}`) : null;
   
-console.log(req.body)
+
     const filter = { _id: freelancerid };
     const update = {$set: {}  };
 
