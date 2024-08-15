@@ -87,6 +87,15 @@ async function sendOfferEmail(freelancer, user) {
   await sendEmail(freelancer.Email, subject, text, html);
 }
 
+async function sendHireEmail(freelancer, post) {
+  const subject = `You have been Hired for ${post.Jobtitle}!`;
+  const text = `Hello ${freelancer.Fullname},\n\nCongratulations! You have been hired for the position of ${post.Jobtitle}.We look forward to your contributions to this project.\n\nPlease review the details and reach out if you have any questions.\n\n`;
+  const html = `<p>Hello ${freelancer.Fullname},</p><p>Congratulations! You have been hired for the position of ${post.Jobtitle}.We look forward to your contributions to this project.</p><p>Please review the details and reach out if you have any questions.</p>`;
+
+  await sendEmail(freelancer.Email, subject, text, html);
+}
+
+
 
 // Function to send scheduled email
 async function sendScheduledEmail(freelancerName,freelancerEmail ,scheduled) {
@@ -129,6 +138,7 @@ module.exports = {
   sendInterviewDateEmail,
   sendOfferEmail,
   sendWelcomeEmail,
+  sendHireEmail,
   sendScheduledEmail,
   contactFormUsers
 };
