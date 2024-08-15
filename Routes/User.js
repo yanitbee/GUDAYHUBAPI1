@@ -4,7 +4,8 @@ const bcrypt = require("bcrypt");
 const { User } = require("../models/User");
 const { nonVerifiedUsers } = require("../models/nonVerifiedUser");
 const { Vcode } = require("../models/verifycod");
-const { sendWelcomeEmail,contactFormUsers } = require('../utils/sendNotificationEmail');
+const { VerificationSchedule } = require("../models/VerificationSchedule");
+const { sendWelcomeEmail,contactFormUsers,sendScheduledEmail } = require('../utils/sendNotificationEmail');
 
 const { body, validationResult } = require('express-validator');
 
@@ -191,6 +192,75 @@ router.post("/sendcode", async (req, res) => {
     res.status(500).send("Server error while sending code");
   }
 });
+
+//schedule verification
+router.post('/schedule-verification', async (req, res) => {
+  try {
+    const { freelancerId, freelancerName, freelancerEmail, verificationDate, verificationTime, notes } = req.body;
+
+    // Check if a schedule already exists for the given freelancerId
+    let schedule = await VerificationSchedule.findOne({ freelancerId });
+
+    if (schedule) {
+      // Update the existing schedule
+      schedule.verificationDate = verificationDate;
+      schedule.verificationTime = verificationTime;
+      schedule.notes = notes;
+
+      const updatedSchedule = await schedule.save();
+
+      sendScheduledEmail(freelancerName, freelancerEmail, updatedSchedule);
+
+      res.status(200).json({ 
+        message: 'Verification schedule updated successfully', 
+        schedule: updatedSchedule 
+      });
+    } else {
+      // Create a new schedule
+      const newSchedule = new VerificationSchedule({
+        freelancerId,
+        verificationDate,
+        verificationTime,
+        notes,
+      });
+
+      const savedSchedule = await newSchedule.save();
+
+      sendScheduledEmail(freelancerName, freelancerEmail, savedSchedule);
+
+      res.status(201).json({ 
+        message: 'verification Scheduled successfully', 
+        schedule: savedSchedule 
+      });
+    }
+  } catch (error) {
+    console.error("Error scheduling verification:", error);
+    res.status(500).json({ message: "Server error while scheduling verification" });
+  }
+});
+
+
+// Get schedule by ID
+router.get('/schedule/:id', async (req, res) => {
+  try {
+      const freelancerid = req.params.id;
+
+      const filter = { freelancerId: freelancerid };
+      const schedule = await VerificationSchedule.findOne(filter);
+
+      if (!schedule) {
+          return res.status(201).json({ message: 'Schedule not found' });
+      }
+
+      res.status(200).json(schedule);
+  } catch (error) {
+      console.error('Error retrieving schedule:', error);
+      res.status(500).json({ message: 'Server error while retrieving schedule' });
+  }
+});
+
+
+
 
 //get user for message
   

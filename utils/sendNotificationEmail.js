@@ -87,6 +87,35 @@ async function sendOfferEmail(freelancer, user) {
   await sendEmail(freelancer.Email, subject, text, html);
 }
 
+
+// Function to send scheduled email
+async function sendScheduledEmail(freelancerName,freelancerEmail ,scheduled) {
+  const subject = 'Your verification has been scheduled successfully';
+  
+  const text = `
+    Hello ${freelancerName},
+    
+    Your verification has been scheduled successfully on:
+    Scheduled Date: ${scheduled.verificationDate}
+    Scheduled Time: ${scheduled.verificationTime}
+    
+    Please bring all the necessary documents and check our website for more details.
+
+  `;
+  
+  const html = `
+    <p>Hello ${freelancerName},</p>
+    <p>Your verification has been scheduled successfully on:</p>
+    <p><strong>Scheduled Date:</strong> ${scheduled.verificationDate}</p>
+    <p><strong>Scheduled Time:</strong> ${scheduled.verificationTime}</p>
+    <p>Please bring all the necessary documents and check our website for more details.</p>
+
+  `;
+
+  await sendEmail(freelancerEmail, subject, text, html);
+}
+
+
 async function contactFormUsers(name,email,message) {
   const subject = `A user my the name ${name} is trying to contact you`;
   const text = `${message}\n\n`;
@@ -100,5 +129,6 @@ module.exports = {
   sendInterviewDateEmail,
   sendOfferEmail,
   sendWelcomeEmail,
+  sendScheduledEmail,
   contactFormUsers
 };

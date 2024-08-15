@@ -232,7 +232,6 @@ router.put("/edit/:id" , async (req, res) => {
         coverletter,
       } = req.body;
 
-      console.log(req.body)
 
       const filter = { _id: postId };
       const update = {$set: {}  };
