@@ -249,6 +249,7 @@ router.get("/allUser", async (req, res) => {
 router.get('/Allschedules', async (req, res) => {
   try {
       const schedules = await VerificationSchedule.find();
+      
       res.status(200).json(schedules);
   } catch (error) {
       console.error('Error retrieving schedules:', error);

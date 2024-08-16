@@ -195,7 +195,7 @@ router.post("/sendcode", async (req, res) => {
 //schedule verification
 router.post('/schedule-verification', async (req, res) => {
   try {
-    const { freelancerId, freelancerName, freelancerEmail, verificationDate, verificationTime, notes } = req.body;
+    const { freelancerId, freelanerName, freelancerEmail, verificationDate, verificationTime, notes } = req.body;
 
     // Check if a schedule already exists for the given freelancerId
     let schedule = await VerificationSchedule.findOne({ freelancerId });
@@ -208,7 +208,7 @@ router.post('/schedule-verification', async (req, res) => {
 
       const updatedSchedule = await schedule.save();
 
-      sendScheduledEmail(freelancerName, freelancerEmail, updatedSchedule);
+      sendScheduledEmail(freelanerName, freelancerEmail, updatedSchedule);
 
       res.status(200).json({ 
         message: 'Verification schedule updated successfully', 
@@ -225,7 +225,7 @@ router.post('/schedule-verification', async (req, res) => {
 
       const savedSchedule = await newSchedule.save();
 
-      sendScheduledEmail(freelancerName, freelancerEmail, savedSchedule);
+      sendScheduledEmail(freelanerName, freelancerEmail, savedSchedule);
 
       res.status(201).json({ 
         message: 'verification Scheduled successfully', 
@@ -251,7 +251,8 @@ router.get('/schedule/:id', async (req, res) => {
           return res.status(201).json({ message: 'Schedule not found' });
       }
 
-      res.status(200).json(schedule);
+      res.status(200).json({ schedule: schedule, message: 'Schedule found' });
+
   } catch (error) {
       console.error('Error retrieving schedule:', error);
       res.status(500).json({ message: 'Server error while retrieving schedule' });
