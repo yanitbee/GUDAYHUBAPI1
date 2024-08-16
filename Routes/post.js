@@ -35,10 +35,6 @@ router.post(
       .optional()
       .isString()
       .withMessage("Qualification must be a string"),
-    body("PostedDate")
-      .optional()
-      .isISO8601()
-      .withMessage("PostedDate must be a valid date"),
     body("Deadline")
       .optional()
       .isISO8601()
@@ -55,10 +51,6 @@ router.post(
       .optional()
       .isString()
       .withMessage("Location must be a string"),
-    body("urgency")
-      .notEmpty()
-      .isBoolean()
-      .withMessage("Urgency must be true or false"),
     body("employerid")
       .notEmpty()
       .isMongoId()
@@ -232,7 +224,6 @@ router.put("/edit/:id" , async (req, res) => {
         coverletter,
       } = req.body;
 
-      console.log(req.body)
 
       const filter = { _id: postId };
       const update = {$set: {}  };
@@ -284,6 +275,25 @@ router.put("/edit/:id" , async (req, res) => {
     } catch (error) {
       console.error("Error reading post:", error);
       res.status(500).json({ message: "Server error while editing freelancer" });
+    }
+  })
+
+  router.put("/changestatus", async (req, res)=>{
+    try{
+      const postid = req.query.postid;
+      const status = req.query.status;
+
+      const filter = { _id: postid };
+      const update = { $set: {status: status} };
+      const updatedPost = await Post.findOneAndUpdate(filter, update, { new: true });
+      if (!updatedPost) {
+        return res.status(404).json({ message: "Post not found" });
+      }
+
+      res.status(200).json(updatedPost);
+    }catch (error){
+        console.log("errorr", error.message)
+        res.status(500).send("server error while changing status for Post")
     }
   })
 

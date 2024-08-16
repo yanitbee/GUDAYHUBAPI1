@@ -79,5 +79,26 @@ router.post("/write", async (req, res) => {
     }
   })
 
+  // Route to get offers by freelancer ID
+router.get('/read', async (req, res) => {
+  try {
+    const { freelancerid } = req.query;
+
+    if (!freelancerid) {
+      return res.status(400).json({ message: 'Freelancer ID is required' });
+    }
+
+    const offers = await Offer.find({ freelancerid });
+
+    if (offers.length === 0) {
+      return res.status(404).json({ message: 'No offers found for this freelancer' });
+    }
+
+    res.status(200).json(offers);
+  } catch (error) {
+    console.error('Error retrieving offers:', error);
+    res.status(500).json({ message: 'Server error while retrieving offers' });
+  }
+});
   
   module.exports = router;
